@@ -1,0 +1,57 @@
+-- Follow Player by CanEge
+local UserInputService = game:GetService("UserInputService")
+local player = game.Players.LocalPlayer
+local mouse = player:GetMouse()
+_G.typing = false
+_G.resetonspawn = false -- make it true if u want a remove ur target when you respawn/die
+_G.target = "Vo1d_walk3r"
+
+UserInputService.InputBegan:Connect(function(input, gameProccesedEvent)
+   if input.KeyCode == Enum.KeyCode.T then -- You can change the keybind
+       if _G.typing == false then
+           if mouse.Target.Parent:FindFirstChild("Humanoid") then
+               for i,v in pairs(game.Players:GetPlayers())do
+                   if mouse.Target.Parent.Name == v.Name and mouse.Target.Parent.Name ~= game.Players.LocalPlayer.Name then
+                       if (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - v.Character.HumanoidRootPart.Position).Magnitude <= 100 then
+                           _G.target = v
+                       end
+                   end
+               end
+           else
+           _G.target = ""
+           end
+       end
+   end
+end)
+
+game:GetService("RunService").RenderStepped:Connect(function()
+   if _G.target ~= "" then
+       for i,v in pairs(game.Players:GetPlayers())do
+           if _G.target.Name == v.Name and _G.target.Name ~= game.Players.LocalPlayer.Name then
+               game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.Character.HumanoidRootPart.CFrame * CFrame.new(0,5,0)
+           end
+       end
+   end
+end)
+
+UserInputService.TextBoxFocused:Connect(function(textbox)
+   if textbox.Name == "ChatBar" then
+       if _G.typing == false then
+           _G.typing = true
+       end
+   end
+end)
+
+UserInputService.TextBoxFocusReleased:Connect(function(textbox)
+   if textbox.Name == "ChatBar" then
+       if _G.typing then
+           _G.typing = false
+       end
+   end
+end)
+
+game.Players.LocalPlayer.CharacterAdded:Connect(function()
+   if _G.resetonspawn then
+       _G.target = ""
+   end
+end)
